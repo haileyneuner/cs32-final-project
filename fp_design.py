@@ -15,91 +15,57 @@
 # High Knees 3x0:30
 # Bear Crawl 3x10 yards
 
-# Simple Workout Generator
+import random  # lets us pick random items
 
-def get_workout(group, muscles, energy, time):
+def get_workout(group, energy, time):
+
     workouts = {
-        "Upper Body": [
-            "Push-ups", "Pull-ups", "Shoulder Taps", "Tricep Dips"
-        ],
-        "Lower Body": [
-            "Squats", "Lunges", "Glute Bridges", "Calf Raises"
-        ],
-        "Core": [
-            "Side Plank", "Mountain Climbers", "High Knees", "Bear Crawl"
-        ]
+        "Upper Body": ["Push-ups", "Pull-ups", "Shoulder Taps", "Tricep Dips"],
+        "Lower Body": ["Squats", "Lunges", "Glute Bridges", "Calf Raises"],
+        "Core": ["Side Plank", "Mountain Climbers", "High Knees", "Bear Crawl"]
     }
 
-    selected_exercises = workouts.get(group, [])
+    # Get list for chosen group
+    exercises = workouts[group]
 
-    # Adjust intensity based on energy
+    # Decide how many exercises based on time
+    if time < 15:
+        num_exercises = 3
+    elif time >= 30:
+        num_exercises = 5
+    else:
+        num_exercises = 4
+
+    # Pick random exercises
+    exercises = random.sample(exercises, min(num_exercises, len(exercises)))
+
+    # Decide difficulty based on energy
     if energy >= 8:
         sets = 3
-        duration = "0:30"
+        duration = "30 sec"
     elif energy >= 5:
         sets = 2
-        duration = "0:20"
+        duration = "20 sec"
     else:
         sets = 1
-        duration = "0:15"
+        duration = "15 sec"
 
-    # Adjust volume based on time
-    if time < 15:
-        selected_exercises = selected_exercises[:3]
-    elif time >= 30:
-        selected_exercises = selected_exercises + selected_exercises[:2]
-
-    return selected_exercises, sets, duration
-
-
-def ask_question(prompt, valid_options=None, cast_func=str):
-    while True:
-        answer = input(prompt).strip()
-
-        if valid_options:
-            if answer.lower() in [opt.lower() for opt in valid_options]:
-                return answer
-            else:
-                print(f"Please choose from: {', '.join(valid_options)}")
-        else:
-            try:
-                return cast_func(answer)
-            except:
-                print("Invalid input, try again.")
+    return exercises, sets, duration
 
 
 def main():
     print("=== Workout Generator ===\n")
 
-    group = ask_question(
-        "1. What muscle group? (Upper Body, Lower Body, Core): ",
-        ["Upper Body", "Lower Body", "Core"]
-    )
+    group = input("Muscle group (Upper Body, Lower Body, Core): ")
+    energy = int(input("Energy level (1-10): "))
+    time = int(input("Time available (minutes): "))
 
-    muscles = ask_question(
-        f"2. Which specific muscles in {group}? "
-    )
+    exercises, sets, duration = get_workout(group, energy, time)
 
-    energy = ask_question(
-        "3. Energy level (1-10): ",
-        cast_func=int
-    )
-
-    time = ask_question(
-        "4. Available time (minutes): ",
-        cast_func=int
-    )
-
-    exercises, sets, duration = get_workout(group, muscles, energy, time)
-
-    print("\n=== Workout of the Day ===")
+    print("\nYour Workout:")
     for ex in exercises:
-        if ex == "Bear Crawl":
-            print(f"{ex}: {sets} x 10 yards")
-        else:
-            print(f"{ex}: {sets} x {duration}")
+        print(f"{ex}: {sets} x {duration}")
 
 
-if __name__ == "__main__":
-    main()
-    
+main()
+
