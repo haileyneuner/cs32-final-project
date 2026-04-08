@@ -52,24 +52,54 @@ def get_workout(group, muscles, energy, time):
     return selected_exercises, sets, duration
 
 
+def ask_question(prompt, valid_options=None, cast_func=str):
+    while True:
+        answer = input(prompt).strip()
+
+        if valid_options:
+            if answer.lower() in [opt.lower() for opt in valid_options]:
+                return answer
+            else:
+                print(f"Please choose from: {', '.join(valid_options)}")
+        else:
+            try:
+                return cast_func(answer)
+            except:
+                print("Invalid input, try again.")
+
+
 def main():
-    print("What muscle group would you like to workout today?")
-    group = input("Select: Upper Body, Lower Body, Core: ")
+    print("=== Workout Generator ===\n")
 
-    muscles = input(f"Which muscles would you like to train within {group}? ")
+    group = ask_question(
+        "1. What muscle group? (Upper Body, Lower Body, Core): ",
+        ["Upper Body", "Lower Body", "Core"]
+    )
 
-    energy = int(input("How much energy do you have today (1-10)? "))
-    time = int(input("How much time do you have (minutes)? "))
+    muscles = ask_question(
+        f"2. Which specific muscles in {group}? "
+    )
+
+    energy = ask_question(
+        "3. Energy level (1-10): ",
+        cast_func=int
+    )
+
+    time = ask_question(
+        "4. Available time (minutes): ",
+        cast_func=int
+    )
 
     exercises, sets, duration = get_workout(group, muscles, energy, time)
 
     print("\n=== Workout of the Day ===")
     for ex in exercises:
         if ex == "Bear Crawl":
-            print(f"{ex} {sets}x10 yards")
+            print(f"{ex}: {sets} x 10 yards")
         else:
-            print(f"{ex} {sets}x{duration}")
+            print(f"{ex}: {sets} x {duration}")
 
 
 if __name__ == "__main__":
     main()
+    
