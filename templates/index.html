@@ -111,7 +111,169 @@
 
         <label>Energy Level</label>
         <input type="range" name="energy" min="1" max="10" value="5" oninput="energyValue.innerText = this.value">
-        <div class="value">Energy: <span id="energyValue">5</span></div>
+        <<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout Generator</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 16px;
+            width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        select, input {
+            width: 100%;
+            margin: 8px 0 15px 0;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            background: #0f172a;
+            color: white;
+        }
+
+        input[type="range"] {
+            appearance: none;
+            height: 6px;
+            background: #334155;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #38bdf8;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .value {
+            font-size: 12px;
+            color: #38bdf8;
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #38bdf8;
+            color: black;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        .card {
+            margin-top: 20px;
+            background: #020617;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        ul {
+            padding-left: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Workout Generator</h1>
+
+    <form method="POST">
+
+        <!-- GOAL -->
+        <label>Fitness Goal</label>
+        <select name="goal">
+            <option>Lose Weight</option>
+            <option>Gain Muscle</option>
+        </select>
+
+        <!-- GROUP -->
+        <label>Muscle Group</label>
+        <select name="group">
+            <option>Upper Body</option>
+            <option>Lower Body</option>
+            <option>Core</option>
+        </select>
+
+        <!-- BENCH -->
+        <label>Bench Max (lbs)</label>
+        <input type="number" name="bench" required>
+
+        <!-- SQUAT -->
+        <label>Squat Max (lbs)</label>
+        <input type="number" name="squat" required>
+
+        <!-- ENERGY -->
+        <label>Energy Level</label>
+        <input type="range" name="energy" min="1" max="10" value="5"
+               oninput="energyVal.innerText = this.value">
+        <div class="value">Energy: <span id="energyVal">5</span></div>
+
+        <!-- TIME (NOW 90 MIN MAX) -->
+        <label>Time Available (minutes)</label>
+        <input type="range" name="time" min="5" max="90" value="30"
+               oninput="timeVal.innerText = this.value">
+        <div class="value">Time: <span id="timeVal">30</span></div>
+
+        <button type="submit">Generate Workout</button>
+    </form>
+
+    {% if workout %}
+    <div class="card">
+        <h2>Workout of the Day</h2>
+        <ul>
+            {% for item in workout %}
+            <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>div class="value">Energy: <span id="energyValue">5</span></div>
 
         <label>Time (minutes)</label>
         <input type="range" name="time" min="5" max="60" value="20" oninput="timeValue.innerText = this.value">
