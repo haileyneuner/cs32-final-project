@@ -4,232 +4,227 @@ import random
 app = Flask(__name__)
 
 HTML = """
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-    <title>Workout Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Generator</title>
 
-    <style>
-        body {
-            font-family: Inter;
-            background: #000;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            padding: 40px;
-        }
+<style>
+body {
+ font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+ background: #f5f7fa;
+ margin: 0;
+}
 
-        .container {
-            width: 420px;
-            background: #111;
-            padding: 25px;
-            border-radius: 14px;
-            border: 1px solid #222;
-        }
+.container {
+ max-width: 420px;
+ margin: auto;
+ padding: 20px;
+}
 
-        h1 { text-align: center; }
+.card {
+ background: white;
+ padding: 20px;
+ border-radius: 16px;
+ box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
-        label { font-size: 12px; color: #aaa; }
+h1, h2, h3 {
+ text-align: center;
+}
 
-        select, input {
-            width: 100%;
-            margin: 6px 0 12px 0;
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #000;
-            color: white;
-        }
+label {
+ font-size: 12px;
+ color: #555;
+}
 
-        input[type="range"] { width: 100%; }
+select, input {
+ width: 100%;
+ margin: 6px 0 12px 0;
+ padding: 10px;
+ border-radius: 8px;
+ border: 1px solid #ddd;
+ background: white;
+}
 
-        .value {
-            font-size: 12px;
-            color: #00ff88;
-            text-align: right;
-            margin-bottom: 10px;
-        }
+.main-btn {
+ width: 100%;
+ padding: 12px;
+ border: none;
+ border-radius: 10px;
+ background: #4CAF50;
+ color: white;
+ font-size: 16px;
+ margin-top: 10px;
+}
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #00ff88;
-            border: none;
-            color: black;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+.exercise {
+ background: #eef2f7;
+ padding: 12px;
+ border-radius: 10px;
+ margin-bottom: 10px;
+}
 
-        button:hover { opacity: 0.85; }
+.set-row {
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ font-size: 13px;
+ margin-left: 5px;
+}
 
-        .card {
-            margin-top: 20px;
-            border: 1px solid #222;
-            padding: 15px;
-            border-radius: 10px;
-        }
+.timer-box {
+ text-align: center;
+ font-size: 32px;
+ padding: 20px;
+ border-radius: 12px;
+ margin: 20px 0;
+ color: white;
+ background: green;
+ transition: background 0.3s;
+}
 
-        .exercise {
-            border-bottom: 1px solid #222;
-            padding: 10px 0;
-        }
+.button-row {
+ display: flex;
+ gap: 10px;
+ margin-top: 10px;
+}
 
-        .sets {
-            margin-top: 8px;
-        }
-
-        .set-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #ccc;
-        }
-
-        .timer {
-            margin-top: 20px;
-            border-top: 1px solid #222;
-            padding-top: 15px;
-            text-align: center;
-        }
-
-        .time {
-            font-size: 32px;
-            color: #00ff88;
-            margin: 10px 0;
-        }
-
-        .timer-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .timer button { flex: 1; }
-    </style>
+.button-row button {
+ flex: 1;
+ padding: 10px;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+ background: white;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
+<div class="card">
 
-    <h1>Workout</h1>
+<h2>Workout Generator</h2>
 
-    <form method="POST">
+<form method="POST">
 
-        <label>Goal</label>
-        <select name="goal">
-            <option>Lose Weight</option>
-            <option>Gain Muscle</option>
-        </select>
+<label>Goal</label>
+<select name="goal">
+  <option>Gain Muscle</option>
+  <option>Lose Weight</option>
+</select>
 
-        <label>Muscle Group</label>
-        <select name="group">
-            <option>Upper Body</option>
-            <option>Lower Body</option>
-            <option>Core</option>
-        </select>
+<label>Muscle Group</label>
+<select name="group">
+  <option>Upper Body</option>
+  <option>Lower Body</option>
+  <option>Core</option>
+</select>
 
-        <label>Bench Max</label>
-        <input type="number" name="bench" required>
+<label>Bench Max</label>
+<input type="number" name="bench" required>
 
-        <label>Squat Max</label>
-        <input type="number" name="squat" required>
+<label>Squat Max</label>
+<input type="number" name="squat" required>
 
-        <label>Energy</label>
-        <input type="range" name="energy" min="1" max="10" value="5"
-               oninput="e.innerText=this.value">
-        <div class="value">Energy: <span id="e">5</span></div>
+<label>Energy: <span id="e">5</span></label>
+<input type="range" name="energy" min="1" max="10" value="5"
+ oninput="e.innerText=this.value">
 
-        <label>Time (minutes)</label>
-        <input type="range" name="time" min="5" max="90" value="30"
-               oninput="t.innerText=this.value">
-        <div class="value">Time: <span id="t">30</span></div>
+<label>Time (minutes)</label>
+<input type="range" name="time" min="5" max="90" value="30"
+ oninput="t.innerText=this.value">
+<div>Time: <span id="t">30</span></div>
 
-        <button type="submit">Generate</button>
-    </form>
+<button class="main-btn" type="submit">Generate</button>
+</form>
 
-    {% if workout %}
+{% if workout %}
 
-    <div class="card">
-        <h3>Workout</h3>
+<div class="card">
+<h3>Workout</h3>
 
-        {% for item in workout %}
-        <div class="exercise">
-            <div><b>{{ item.name }}</b> — {{ item.weight }}</div>
+{% for item in workout %}
+<div class="exercise">
 
-            <div class="sets">
-                {% for s in range(item.sets) %}
-                <div class="set-row">
-                    <input type="checkbox">
-                    Set {{ s + 1 }} — {{ item.reps }} reps
-                </div>
-                {% endfor %}
-            </div>
+  <b>{{ item.name }}</b> — {{ item.weight }}
 
-            <small style="color:#00ff88;">Rest: {{ item.rest }} sec</small>
-        </div>
-        {% endfor %}
+  <div style="margin-top:8px;">
+    {% for s in range(item.sets) %}
+    <div class="set-row">
+      <input type="checkbox">
+      Set {{ s+1 }} — {{ item.reps }} reps
     </div>
+    {% endfor %}
+  </div>
 
-    {% endif %}
-
-    <!-- TIMER -->
-    <div class="timer">
-        <h3>Countdown Timer</h3>
-        <div class="time" id="timeDisplay">00:00</div>
-
-        <div class="timer-controls">
-            <button type="button" onclick="startTimer()">Start</button>
-            <button type="button" onclick="pauseTimer()">Pause</button>
-            <button type="button" onclick="resetTimer()">Reset</button>
-        </div>
-    </div>
+  <small>Rest: {{ item.rest }} sec</small>
+</div>
+{% endfor %}
 
 </div>
 
+<div class="timer-box" id="timerBox">30:00</div>
+
+<div class="button-row">
+<button onclick="startTimer()">Start</button>
+<button onclick="pauseTimer()">Pause</button>
+<button onclick="resetTimer()">Reset</button>
+</div>
+
+{% endif %}
+
+</div>
+</div>
+
 <script>
-let timer = null;
-let seconds = 30 * 60; // default 30 min countdown
-let running = false;
+
+let seconds = 30 * 60;
+let interval = null;
 
 function updateDisplay() {
-    let m = Math.floor(seconds / 60);
-    let s = seconds % 60;
+ let m = Math.floor(seconds / 60);
+ let s = seconds % 60;
 
-    document.getElementById("timeDisplay").innerText =
-        String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+ document.getElementById("timerBox").innerText =
+ String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+
+ let box = document.getElementById("timerBox");
+
+ if (seconds > 300) box.style.background = "green";
+ else if (seconds > 60) box.style.background = "goldenrod";
+ else box.style.background = "red";
 }
 
 function startTimer() {
-    if (running) return;
-    running = true;
+ if (interval) return;
 
-    timer = setInterval(() => {
-        if (seconds > 0) {
-            seconds--;
-            updateDisplay();
-        } else {
-            pauseTimer();
-            alert("Workout Complete 🔥");
-        }
-    }, 1000);
+ interval = setInterval(() => {
+   if (seconds > 0) {
+     seconds--;
+     updateDisplay();
+   } else {
+     clearInterval(interval);
+     alert("Workout Complete 🔥");
+   }
+ }, 1000);
 }
 
 function pauseTimer() {
-    running = false;
-    clearInterval(timer);
+ clearInterval(interval);
+ interval = null;
 }
 
 function resetTimer() {
-    pauseTimer();
-    seconds = 30 * 60;
-    updateDisplay();
+ pauseTimer();
+ seconds = 30 * 60;
+ updateDisplay();
 }
 
 updateDisplay();
+
 </script>
 
 </body>
@@ -267,7 +262,7 @@ def get_workout(group, energy, time, bench, squat, goal):
         if ex in ["Bench Press", "Incline Bench Press"]:
             weight = f"{calc_weight(bench, energy, goal)} lbs"
 
-        elif ex in ["Bar Squats"]:
+        elif ex == "Bar Squats":
             weight = f"{calc_weight(squat, energy, goal)} lbs"
 
         elif ex in ["Shoulder Press", "Tricep Dips", "Bicep Curls", "Dumbbell Rows"]:
@@ -276,7 +271,6 @@ def get_workout(group, energy, time, bench, squat, goal):
         elif ex in ["Goblet Squats", "RDL", "Lunges"]:
             weight = f"{calc_weight(squat * 0.5, energy, goal)} lbs (DB)"
 
-        # sets + reps scaling
         if energy >= 8:
             sets, reps, rest = 4, 10, 60
         elif energy >= 5:
