@@ -4,192 +4,281 @@ import random
 app = Flask(__name__)
 
 HTML = """
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workout App</title>
+    <title>Workout Generator</title>
 
-<style>
-body {
- font-family: -apple-system, BlinkMacSystemFont, sans-serif;
- background: #f5f7fa;
- margin: 0;
-}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-.container {
- max-width: 400px;
- margin: auto;
- padding: 20px;
-}
+    <style>
+        body {
+            font-family: Inter;
+            background: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
 
-.card {
- background: white;
- padding: 20px;
- border-radius: 16px;
- box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+        .container {
+            width: 420px;
+            background: #111;
+            padding: 25px;
+            border-radius: 14px;
+            border: 1px solid #222;
+        }
 
-h2, h3 { text-align: center; }
+        h1 { text-align: center; }
 
-.main-btn {
- width: 100%;
- padding: 12px;
- border: none;
- border-radius: 10px;
- background: #4CAF50;
- color: white;
- font-size: 16px;
- margin-top: 10px;
-}
+        label {
+            font-size: 12px;
+            color: #aaa;
+        }
 
-.exercise {
- background: #eef2f7;
- padding: 12px;
- border-radius: 10px;
- margin-bottom: 10px;
-}
+        select, input {
+            width: 100%;
+            margin: 6px 0 12px 0;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #000;
+            color: white;
+        }
 
-.timer-box {
- text-align: center;
- font-size: 32px;
- padding: 20px;
- border-radius: 12px;
- margin: 20px 0;
- color: white;
- background: green;
-}
-</style>
+        input[type="range"] { width: 100%; }
+
+        .value {
+            font-size: 12px;
+            color: #00ff88;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00ff88;
+            border: none;
+            color: black;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover { opacity: 0.85; }
+
+        .card {
+            margin-top: 20px;
+            border: 1px solid #222;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        li { margin-bottom: 6px; }
+
+        .timer {
+            margin-top: 20px;
+            border-top: 1px solid #222;
+            padding-top: 15px;
+            text-align: center;
+        }
+
+        .time {
+            font-size: 32px;
+            color: #00ff88;
+            margin: 10px 0;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .timer button { flex: 1; }
+    </style>
 </head>
 
 <body>
+
 <div class="container">
-<div class="card">
 
-<h2>Workout Generator</h2>
+    <h1>Workout</h1>
 
-<form method="post">
-  <label>Muscle Group</label>
-  <select name="group">
-    <option>Upper Body</option>
-    <option>Lower Body</option>
-    <option>Core</option>
-  </select><br><br>
+    <form method="POST">
 
-  <label>Energy: <span id="energyValue">5</span></label>
-  <input type="range" name="energy" min="1" max="10" value="5"
-         oninput="energyValue.innerText = this.value"><br><br>
+        <label>Goal</label>
+        <select name="goal">
+            <option>Lose Weight</option>
+            <option>Gain Muscle</option>
+        </select>
 
-  <label>Time (minutes)</label>
-  <input type="number" name="time" required><br><br>
+        <label>Muscle Group</label>
+        <select name="group" id="groupSelect" onchange="checkGroup()">
+            <option>Upper Body</option>
+            <option>Lower Body</option>
+            <option>Core</option>
+        </select>
 
-  <label>Max Bench (lbs)</label>
-  <input type="number" name="bench" required><br><br>
+        <label>Bench Max</label>
+        <input type="number" name="bench" required>
 
-  <label>Max Squat (lbs)</label>
-  <input type="number" name="squat" required><br><br>
+        <label>Squat Max</label>
+        <input type="number" name="squat" required>
 
-  <button class="main-btn" type="submit">Generate</button>
-</form>
+        <label>Energy</label>
+        <input type="range" name="energy" min="1" max="10" value="5"
+               oninput="e.innerText=this.value">
+        <div class="value">Energy: <span id="e">5</span></div>
 
-{% if workout %}
+        <label>Time (minutes)</label>
+        <input type="range" name="time" min="5" max="90" value="30"
+               oninput="t.innerText=this.value">
+        <div class="value">Time: <span id="t">30</span></div>
 
-<div class="timer-box">00:30</div>
+        <button type="submit">Generate</button>
+    </form>
 
-<h3>Workout of the Day</h3>
+    {% if workout %}
+    <div class="card">
+        <h3>Workout</h3>
+        <ul>
+            {% for item in workout %}
+            <li>
+                {{ item.name }}
+                <span style="color:#00ff88;"> — {{ item.weight }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
-{% for ex, weight in workout %}
-  <div class="exercise">
-    {{ ex }}<br>
-    <small>{{ weight }} | {{ sets }} x {{ duration }}</small>
-  </div>
-{% endfor %}
+    <!-- TIMER -->
+    <div class="timer" id="timerBox">
+        <h3>Core Timer</h3>
+        <div class="time" id="timeDisplay">00:00</div>
 
-{% endif %}
+        <div class="timer-controls">
+            <button type="button" onclick="startTimer()">Start</button>
+            <button type="button" onclick="pauseTimer()">Pause</button>
+            <button type="button" onclick="resetTimer()">Reset</button>
+        </div>
+    </div>
 
 </div>
-</div>
+
+<script>
+let timer = null;
+let seconds = 0;
+let running = false;
+
+function updateDisplay() {
+    let m = Math.floor(seconds / 60);
+    let s = seconds % 60;
+    document.getElementById("timeDisplay").innerText =
+        String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+}
+
+function startTimer() {
+    if (running) return;
+    running = true;
+    timer = setInterval(() => {
+        seconds++;
+        updateDisplay();
+    }, 1000);
+}
+
+function pauseTimer() {
+    running = false;
+    clearInterval(timer);
+}
+
+function resetTimer() {
+    pauseTimer();
+    seconds = 0;
+    updateDisplay();
+}
+
+function checkGroup() {
+    const group = document.getElementById("groupSelect").value;
+    const box = document.getElementById("timerBox");
+    box.style.display = (group === "Core") ? "block" : "block";
+}
+
+document.addEventListener("DOMContentLoaded", checkGroup);
+</script>
+
 </body>
 </html>
 """
 
-def calc_load(max_lift, energy, percent_low, percent_mid, percent_high):
-    if energy >= 8:
-        pct = percent_high
-    elif energy >= 5:
-        pct = percent_mid
+# ---------- SMART WEIGHT LOGIC ----------
+
+def calc_weight(max_lift, energy, goal):
+    if goal == "Gain Muscle":
+        pct = 0.80 if energy >= 8 else 0.70 if energy >= 5 else 0.60
     else:
-        pct = percent_low
-    return round(max_lift * pct / 100, -5)  # rounds to nearest 5 lbs
+        pct = 0.65 if energy >= 8 else 0.55 if energy >= 5 else 0.45
+
+    weight = round(max_lift * pct / 5) * 5
+    return weight
 
 
-def get_workout(group, energy, time, bench, squat):
+def get_workout(group, energy, time, bench, squat, goal):
 
     workouts = {
         "Upper Body": ["Push-ups", "Pull-ups", "Shoulder Press", "Tricep Dips",
                        "Bicep Curls", "Bench Press", "Incline Bench Press", "Dumbbell Rows"],
         "Lower Body": ["Bar Squats", "Goblet Squats", "Bulgarian Split Squats",
                        "RDL", "Lunges", "Glute Bridges", "Calf Raises"],
-        "Core": ["Side Plank", "Mountain Climbers", "High Knees",
-                 "Bear Crawl", "Dead Bugs", "Planks", "Crunches"]
+        "Core": ["Planks", "Crunches", "Mountain Climbers", "Dead Bugs", "Bear Crawl"]
     }
 
-    exercises = random.sample(workouts[group], 4 if time < 30 else 5)
+    selected = random.sample(workouts[group], 4)
 
     output = []
 
-    for ex in exercises:
+    for ex in selected:
 
         weight = "Bodyweight"
 
-        # Upper body strength lifts
-        if ex in ["Bench Press", "Incline Bench Press", "Shoulder Press"]:
-            w = calc_load(bench, energy, 60, 70, 85)
-            weight = f"{w} lbs"
+        # Bench-based lifts
+        if ex in ["Bench Press", "Incline Bench Press"]:
+            weight = f"{calc_weight(bench, energy, goal)} lbs"
 
-        elif ex in ["Bar Squats"]:
-            w = calc_load(squat, energy, 65, 75, 85)
-            weight = f"{w} lbs"
+        elif ex in ["Shoulder Press", "Tricep Dips", "Bicep Curls", "Dumbbell Rows"]:
+            weight = f"{calc_weight(bench * 0.6, energy, goal)} lbs (DB)"
+
+        # Squat-based lifts
+        elif ex == "Bar Squats":
+            weight = f"{calc_weight(squat, energy, goal)} lbs"
 
         elif ex in ["Goblet Squats", "RDL", "Lunges"]:
-            w = calc_load(squat, energy, 40, 50, 60)
-            weight = f"Dumbbells ~{w} lbs total"
+            weight = f"{calc_weight(squat * 0.5, energy, goal)} lbs (DB)"
 
-        elif ex in ["Bicep Curls", "Tricep Dips", "Dumbbell Rows"]:
-            w = calc_load(bench, energy, 30, 40, 50)
-            weight = f"Dumbbells ~{w} lbs total"
+        output.append({"name": ex, "weight": weight})
 
-        output.append((ex, weight))
+    return output
 
-    if energy >= 8:
-        sets, duration = 3, "45 sec"
-    elif energy >= 5:
-        sets, duration = 3, "30 sec"
-    else:
-        sets, duration = 2, "20 sec"
 
-    return output, sets, duration
-
+# ---------- FLASK ----------
 
 @app.route("/", methods=["GET", "POST"])
 def home():
+    workout = None
+
     if request.method == "POST":
         group = request.form["group"]
         energy = int(request.form["energy"])
         time = int(request.form["time"])
         bench = int(request.form["bench"])
         squat = int(request.form["squat"])
+        goal = request.form["goal"]
 
-        workout, sets, duration = get_workout(group, energy, time, bench, squat)
+        workout = get_workout(group, energy, time, bench, squat, goal)
 
-        return render_template_string(
-            HTML,
-            workout=workout,
-            sets=sets,
-            duration=duration
-        )
-
-    return render_template_string(HTML, workout=None)
+    return render_template_string(HTML, workout=workout)
 
 
 if __name__ == "__main__":
