@@ -75,7 +75,7 @@ select, input {
  cursor: pointer;
 }
 
-/* TIMER (EXACT FIRST STYLE) */
+/* TIMER */
 .timer-title {
  text-align: center;
  margin-top: 20px;
@@ -168,13 +168,11 @@ select, input {
     <small>{{ item.sets }} x {{ item.reps }} | {{ item.weight }} | Rest {{ item.rest }}s</small>
   </div>
 
-  <!-- ✔ / ✖ TOGGLE (EXACT FIRST STYLE) -->
   <button class="icon-btn" onclick="toggle(this)">✔</button>
 
 </div>
 {% endfor %}
 
-<!-- REST TIMER -->
 <div class="timer-title">REST TIMER</div>
 
 <div class="timer-box" id="timerBox">00:30</div>
@@ -192,7 +190,7 @@ select, input {
 
 <script>
 
-/* ---------------- TOGGLE (EXACT FIRST STYLE) ---------------- */
+/* ---------------- TOGGLE ---------------- */
 function toggle(btn) {
  if (btn.innerText === "✔") {
    btn.innerText = "✖";
@@ -203,20 +201,23 @@ function toggle(btn) {
  }
 }
 
-/* ---------------- REST TIMER ---------------- */
+/* ---------------- TIMER FIXED (MM:SS) ---------------- */
 let interval = null;
 let time = {{ workout[0].rest if workout else 30 }};
 
 function updateDisplay() {
- let sec = time % 60;
- let display = "00:" + (sec < 10 ? "0" + sec : sec);
+ let m = Math.floor(time / 60);
+ let s = time % 60;
+
+ let display =
+   String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
  const box = document.getElementById("timerBox");
 
  if (box) {
    box.innerText = display;
 
-   if (time > 5) {
+   if (time > 10) {
      box.style.background = "green";
    } else if (time > 0) {
      box.style.background = "goldenrod";
