@@ -7,87 +7,97 @@
 
     <style>
         body {
-            font-family: Inter, sans-serif;
-            background: #0f172a;
-            color: white;
+            font-family: Inter;
+            background: #000;
+            color: #fff;
             display: flex;
             justify-content: center;
             padding: 40px;
         }
 
         .container {
-            background: #1e293b;
-            width: 400px;
+            width: 420px;
+            background: #111;
             padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border-radius: 14px;
+            border: 1px solid #222;
         }
 
         h1 {
             text-align: center;
+            margin-bottom: 20px;
         }
 
         label {
-            font-size: 13px;
-            color: #94a3b8;
+            font-size: 12px;
+            color: #aaa;
         }
 
         select, input {
             width: 100%;
-            margin: 8px 0 14px 0;
+            margin: 6px 0 12px 0;
             padding: 8px;
             border-radius: 8px;
-            border: none;
-            background: #0f172a;
+            border: 1px solid #333;
+            background: #000;
             color: white;
         }
 
         input[type="range"] {
-            appearance: none;
-            height: 6px;
-            background: #334155;
-            border-radius: 5px;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            background: #38bdf8;
-            border-radius: 50%;
+            width: 100%;
         }
 
         .value {
             font-size: 12px;
-            color: #38bdf8;
+            color: #00ff88;
             text-align: right;
-            margin-top: -8px;
             margin-bottom: 10px;
         }
 
         button {
             width: 100%;
             padding: 12px;
-            background: #38bdf8;
+            background: #00ff88;
             border: none;
+            color: black;
+            font-weight: bold;
             border-radius: 10px;
-            font-weight: 600;
             cursor: pointer;
+            margin-top: 10px;
         }
 
         button:hover {
-            background: #0ea5e9;
+            opacity: 0.85;
         }
 
         .card {
             margin-top: 20px;
-            background: #020617;
+            border: 1px solid #222;
             padding: 15px;
-            border-radius: 12px;
+            border-radius: 10px;
         }
 
         li {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+        }
+
+        /* TIMER */
+        .timer {
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid #222;
+            padding-top: 15px;
+        }
+
+        .time {
+            font-size: 32px;
+            margin: 10px 0;
+            color: #00ff88;
+        }
+
+        .timer button {
+            width: 30%;
+            margin: 5px;
         }
     </style>
 </head>
@@ -96,18 +106,18 @@
 
 <div class="container">
 
-    <h1>Workout Generator</h1>
+    <h1>Workout</h1>
 
     <form method="POST">
 
-        <label>Fitness Goal</label>
+        <label>Goal</label>
         <select name="goal">
             <option>Lose Weight</option>
             <option>Gain Muscle</option>
         </select>
 
-        <label>Muscle Group</label>
-        <select name="group">
+        <label>Group</label>
+        <select name="group" id="groupSelect" onchange="toggleTimer()">
             <option>Upper Body</option>
             <option>Lower Body</option>
             <option>Core</option>
@@ -129,13 +139,12 @@
                oninput="t.innerText=this.value">
         <div class="value">Time: <span id="t">30</span></div>
 
-        <button type="submit">Generate Workout</button>
-
+        <button type="submit">Generate</button>
     </form>
 
     {% if workout %}
     <div class="card">
-        <h3>Workout of the Day</h3>
+        <h3>Workout</h3>
         <ul>
             {% for item in workout %}
             <li>{{ item }}</li>
@@ -144,7 +153,56 @@
     </div>
     {% endif %}
 
+    <!-- TIMER (ONLY FOR CORE) -->
+    <div class="timer" id="timerBox" style="display:none;">
+        <h3>Core Timer</h3>
+        <div class="time" id="timeDisplay">00:00</div>
+
+        <button onclick="startTimer()">Start</button>
+        <button onclick="pauseTimer()">Pause</button>
+        <button onclick="resetTimer()">Reset</button>
+    </div>
+
 </div>
+
+<script>
+let timer;
+let seconds = 0;
+let running = false;
+
+function updateDisplay() {
+    let m = Math.floor(seconds / 60);
+    let s = seconds % 60;
+    document.getElementById("timeDisplay").innerText =
+        String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
+}
+
+function startTimer() {
+    if (running) return;
+    running = true;
+    timer = setInterval(() => {
+        seconds++;
+        updateDisplay();
+    }, 1000);
+}
+
+function pauseTimer() {
+    running = false;
+    clearInterval(timer);
+}
+
+function resetTimer() {
+    pauseTimer();
+    seconds = 0;
+    updateDisplay();
+}
+
+function toggleTimer() {
+    let group = document.getElementById("groupSelect").value;
+    document.getElementById("timerBox").style.display =
+        (group === "Core") ? "block" : "none";
+}
+</script>
 
 </body>
 </html>

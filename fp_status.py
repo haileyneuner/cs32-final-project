@@ -1,7 +1,12 @@
 from flask import Flask, render_template, request
 import random
+import math
 
 app = Flask(__name__)
+
+
+def round_to_5(x):
+    return int(round(x / 5) * 5)
 
 
 def get_workout(group, energy, time, goal, bench_max, squat_max):
@@ -15,7 +20,6 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
     core = ["Side Plank", "Mountain Climbers", "High Knees",
             "Bear Crawl", "Dead Bugs", "V-ups"]
 
-    # pick group
     if group == "Upper Body":
         exercises = upper
     elif group == "Lower Body":
@@ -23,7 +27,6 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
     else:
         exercises = core
 
-    # number of exercises
     if time <= 15:
         count = 3
     elif time <= 45:
@@ -32,17 +35,16 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
         count = 5
 
     chosen = random.sample(exercises, min(count, len(exercises)))
-
     plan = []
 
     for ex in chosen:
 
-        # 🔥 CORE = TIME BASED
+        # CORE = TIME BASED
         if group == "Core":
-            duration = "0:45" if goal == "Lose Weight" else "0:30"
+            duration = "45 sec" if goal == "Lose Weight" else "30 sec"
             plan.append(f"{ex}: 3 x {duration}")
 
-        # 💪 UPPER = BENCH BASED
+        # UPPER = WEIGHT BASED (bench)
         elif group == "Upper Body":
 
             if goal == "Gain Muscle":
@@ -52,13 +54,16 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
                 reps = "12–15"
                 pct = 0.60
 
-            if "Bench" in ex or "Push" in ex:
-                weight = int(bench_max * pct)
-                plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
-            else:
-                plan.append(f"{ex}: 3 x {reps}")
+            weight = None
 
-        # 🦵 LOWER = SQUAT BASED
+            if "Bench" in ex or "Push" in ex or "Press" in ex:
+                weight = round_to_5(bench_max * pct)
+            else:
+                weight = round_to_5(bench_max * 0.4)
+
+            plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
+
+        # LOWER = WEIGHT BASED (squat)
         else:
 
             if goal == "Gain Muscle":
@@ -69,12 +74,13 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
                 pct = 0.60
 
             if "Squat" in ex or "Lunge" in ex:
-                weight = int(squat_max * pct)
-                plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
+                weight = round_to_5(squat_max * pct)
             else:
-                plan.append(f"{ex}: 3 x {reps}")
+                weight = round_to_5(squat_max * 0.5)
 
-    return plan   # ✅ IMPORTANT: only ONE return type
+            plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
+
+    return plan
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -91,7 +97,7 @@ def index():
 
         workout = get_workout(group, energy, time, goal, bench, squat)
 
-    return render_template("index.html", workout=workout)
+    return render_template("index.html", workout=workout, group=None)
 
 
 if __name__ == "__main__":
