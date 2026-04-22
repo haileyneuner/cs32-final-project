@@ -25,7 +25,6 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 20px;
         }
 
         label {
@@ -84,20 +83,24 @@
         /* TIMER */
         .timer {
             margin-top: 20px;
-            text-align: center;
             border-top: 1px solid #222;
             padding-top: 15px;
+            text-align: center;
         }
 
         .time {
             font-size: 32px;
-            margin: 10px 0;
             color: #00ff88;
+            margin: 10px 0;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
         }
 
         .timer button {
-            width: 30%;
-            margin: 5px;
+            flex: 1;
         }
     </style>
 </head>
@@ -116,8 +119,8 @@
             <option>Gain Muscle</option>
         </select>
 
-        <label>Group</label>
-        <select name="group" id="groupSelect" onchange="toggleTimer()">
+        <label>Muscle Group</label>
+        <select name="group" id="groupSelect" onchange="checkGroup()">
             <option>Upper Body</option>
             <option>Lower Body</option>
             <option>Core</option>
@@ -153,20 +156,22 @@
     </div>
     {% endif %}
 
-    <!-- TIMER (ONLY FOR CORE) -->
-    <div class="timer" id="timerBox" style="display:none;">
+    <!-- TIMER -->
+    <div class="timer" id="timerBox">
         <h3>Core Timer</h3>
         <div class="time" id="timeDisplay">00:00</div>
 
-        <button onclick="startTimer()">Start</button>
-        <button onclick="pauseTimer()">Pause</button>
-        <button onclick="resetTimer()">Reset</button>
+        <div class="timer-controls">
+            <button type="button" onclick="startTimer()">Start</button>
+            <button type="button" onclick="pauseTimer()">Pause</button>
+            <button type="button" onclick="resetTimer()">Reset</button>
+        </div>
     </div>
 
 </div>
 
 <script>
-let timer;
+let timer = null;
 let seconds = 0;
 let running = false;
 
@@ -174,7 +179,7 @@ function updateDisplay() {
     let m = Math.floor(seconds / 60);
     let s = seconds % 60;
     document.getElementById("timeDisplay").innerText =
-        String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
+        String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 }
 
 function startTimer() {
@@ -197,11 +202,14 @@ function resetTimer() {
     updateDisplay();
 }
 
-function toggleTimer() {
-    let group = document.getElementById("groupSelect").value;
-    document.getElementById("timerBox").style.display =
-        (group === "Core") ? "block" : "none";
+function checkGroup() {
+    const group = document.getElementById("groupSelect").value;
+    const box = document.getElementById("timerBox");
+
+    box.style.display = (group === "Core") ? "block" : "none";
 }
+
+document.addEventListener("DOMContentLoaded", checkGroup);
 </script>
 
 </body>
