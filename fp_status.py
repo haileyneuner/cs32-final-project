@@ -3,76 +3,75 @@ import random
 
 app = Flask(__name__)
 
+
 def get_workout(group, energy, time, goal, bench_max, squat_max):
-    upper_workouts = ["Bench Press", "Incline Bench Press", "Push-ups",
-                      "Shoulder Press", "Tricep Dips", "Dumbbell Rows"]
 
-    lower_workouts = ["Bar Squats", "Goblet Squats", "Lunges",
-                      "RDL", "Glute Bridges", "Calf Raises"]
+    upper = ["Bench Press", "Incline Bench Press", "Push-ups",
+             "Shoulder Press", "Tricep Dips", "Dumbbell Rows"]
 
-    core_workouts = ["Side Plank", "Mountain Climbers", "High Knees",
-                     "Bear Crawl", "Dead Bugs", "V-ups"]
+    lower = ["Bar Squats", "Goblet Squats", "Lunges",
+             "RDL", "Glute Bridges", "Calf Raises"]
 
-    # choose correct list
+    core = ["Side Plank", "Mountain Climbers", "High Knees",
+            "Bear Crawl", "Dead Bugs", "V-ups"]
+
+    # select group
     if group == "Upper Body":
-        exercises = upper_workouts
+        exercises = upper
     elif group == "Lower Body":
-        exercises = lower_workouts
+        exercises = lower
     else:
-        exercises = core_workouts
+        exercises = core
 
-    # number of exercises
+    # workout size based on time
     if time <= 15:
-        num_exercises = 3
+        count = 3
     elif time <= 45:
-        num_exercises = 4
+        count = 4
     else:
-        num_exercises = 5
+        count = 5
 
-    selected = random.sample(exercises, min(num_exercises, len(exercises)))
-    workout_plan = []
+    chosen = random.sample(exercises, min(count, len(exercises)))
+    plan = []
 
-    for ex in selected:
+    for ex in chosen:
 
-        # CORE (time-based)
+        # CORE → time based
         if group == "Core":
             duration = "0:45" if goal == "Lose Weight" else "0:30"
-            sets = 3
-            workout_plan.append(f"{ex}: {sets} x {duration}")
+            plan.append(f"{ex}: 3 x {duration}")
 
-        # UPPER BODY (bench-based)
+        # UPPER → bench-based
         elif group == "Upper Body":
             if goal == "Gain Muscle":
                 reps = "8–10"
-                intensity = 0.75
+                pct = 0.75
             else:
                 reps = "12–15"
-                intensity = 0.60
+                pct = 0.60
 
-            # weight logic for upper
             if "Bench" in ex or "Push" in ex:
-                weight = int(bench_max * intensity)
-                workout_plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
+                weight = int(bench_max * pct)
+                plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
             else:
-                workout_plan.append(f"{ex}: 3 x {reps} (Bodyweight/Moderate)")
+                plan.append(f"{ex}: 3 x {reps}")
 
-        # 🦵 LOWER BODY (squat-based)
-        elif group == "Lower Body":
+        # LOWER → squat-based
+        else:
             if goal == "Gain Muscle":
                 reps = "8–10"
-                intensity = 0.75
+                pct = 0.75
             else:
                 reps = "12–15"
-                intensity = 0.60
+                pct = 0.60
 
-            # weight logic for lower
             if "Squat" in ex or "Lunge" in ex:
-                weight = int(squat_max * intensity)
-                workout_plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
+                weight = int(squat_max * pct)
+                plan.append(f"{ex}: 3 x {reps} @ {weight} lbs")
             else:
-                workout_plan.append(f"{ex}: 3 x {reps} (Bodyweight/Moderate)")
+                plan.append(f"{ex}: 3 x {reps}")
 
-    return workout_plan
+    return plan
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -83,9 +82,11 @@ def index():
         group = request.form["group"]
         energy = int(request.form["energy"])
         time = int(request.form["time"])
+        goal = request.form["goal"]
+        bench = int(request.form["bench"])
+        squat = int(request.form["squat"])
 
-        exercises, sets, duration = get_workout(group, energy, time)
-        workout = [(ex, sets, duration) for ex in exercises]
+        workout = get_workout(group, energy, time, goal, bench, squat)
 
     return render_template("index.html", workout=workout)
 
