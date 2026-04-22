@@ -3,124 +3,11 @@
 <head>
     <title>Workout Generator</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0f172a;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 16px;
-            width: 350px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-
-        select, input[type="range"] {
-            width: 100%;
-            margin: 10px 0 20px 0;
-        }
-
-        input[type="range"] {
-            appearance: none;
-            height: 6px;
-            background: #334155;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            background: #38bdf8;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .value {
-            text-align: right;
-            margin-top: -15px;
-            margin-bottom: 10px;
-            font-size: 12px;
-            color: #38bdf8;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #38bdf8;
-            color: black;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #0ea5e9;
-        }
-
-        .card {
-            margin-top: 20px;
-            background: #020617;
-            padding: 15px;
-            border-radius: 12px;
-        }
-
-        ul {
-            padding-left: 15px;
-        }
-
-        li {
-            margin-bottom: 8px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>Workout Generator</h1>
-
-    <form method="POST">
-        <label>Muscle Group</label>
-        <select name="group">
-            <option>Upper Body</option>
-            <option>Lower Body</option>
-            <option>Core</option>
-        </select>
-
-        <label>Energy Level</label>
-        <input type="range" name="energy" min="1" max="10" value="5" oninput="energyValue.innerText = this.value">
-        <<!DOCTYPE html>
-<html>
-<head>
-    <title>Workout Generator</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, sans-serif;
             background: #0f172a;
             color: white;
             display: flex;
@@ -130,15 +17,14 @@
 
         .container {
             background: #1e293b;
+            width: 400px;
             padding: 25px;
             border-radius: 16px;
-            width: 380px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 20px;
         }
 
         label {
@@ -148,7 +34,7 @@
 
         select, input {
             width: 100%;
-            margin: 8px 0 15px 0;
+            margin: 8px 0 14px 0;
             padding: 8px;
             border-radius: 8px;
             border: none;
@@ -161,7 +47,6 @@
             height: 6px;
             background: #334155;
             border-radius: 5px;
-            outline: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
@@ -170,27 +55,24 @@
             height: 16px;
             background: #38bdf8;
             border-radius: 50%;
-            cursor: pointer;
         }
 
         .value {
             font-size: 12px;
             color: #38bdf8;
             text-align: right;
-            margin-top: -10px;
+            margin-top: -8px;
             margin-bottom: 10px;
         }
 
         button {
             width: 100%;
             padding: 12px;
+            background: #38bdf8;
             border: none;
             border-radius: 10px;
-            background: #38bdf8;
-            color: black;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
         }
 
         button:hover {
@@ -204,10 +86,6 @@
             border-radius: 12px;
         }
 
-        ul {
-            padding-left: 15px;
-        }
-
         li {
             margin-bottom: 8px;
         }
@@ -217,18 +95,17 @@
 <body>
 
 <div class="container">
+
     <h1>Workout Generator</h1>
 
     <form method="POST">
 
-        <!-- GOAL -->
         <label>Fitness Goal</label>
         <select name="goal">
             <option>Lose Weight</option>
             <option>Gain Muscle</option>
         </select>
 
-        <!-- GROUP -->
         <label>Muscle Group</label>
         <select name="group">
             <option>Upper Body</option>
@@ -236,32 +113,29 @@
             <option>Core</option>
         </select>
 
-        <!-- BENCH -->
-        <label>Bench Max (lbs)</label>
+        <label>Bench Max</label>
         <input type="number" name="bench" required>
 
-        <!-- SQUAT -->
-        <label>Squat Max (lbs)</label>
+        <label>Squat Max</label>
         <input type="number" name="squat" required>
 
-        <!-- ENERGY -->
-        <label>Energy Level</label>
+        <label>Energy</label>
         <input type="range" name="energy" min="1" max="10" value="5"
-               oninput="energyVal.innerText = this.value">
-        <div class="value">Energy: <span id="energyVal">5</span></div>
+               oninput="e.innerText=this.value">
+        <div class="value">Energy: <span id="e">5</span></div>
 
-        <!-- TIME (NOW 90 MIN MAX) -->
-        <label>Time Available (minutes)</label>
+        <label>Time (minutes)</label>
         <input type="range" name="time" min="5" max="90" value="30"
-               oninput="timeVal.innerText = this.value">
-        <div class="value">Time: <span id="timeVal">30</span></div>
+               oninput="t.innerText=this.value">
+        <div class="value">Time: <span id="t">30</span></div>
 
         <button type="submit">Generate Workout</button>
+
     </form>
 
     {% if workout %}
     <div class="card">
-        <h2>Workout of the Day</h2>
+        <h3>Workout of the Day</h3>
         <ul>
             {% for item in workout %}
             <li>{{ item }}</li>
@@ -270,28 +144,6 @@
     </div>
     {% endif %}
 
-</div>
-
-</body>
-</html>div class="value">Energy: <span id="energyValue">5</span></div>
-
-        <label>Time (minutes)</label>
-        <input type="range" name="time" min="5" max="60" value="20" oninput="timeValue.innerText = this.value">
-        <div class="value">Time: <span id="timeValue">20</span></div>
-
-        <button type="submit">Generate Workout</button>
-    </form>
-
-    {% if workout %}
-    <div class="card">
-        <h2>Workout of the Day</h2>
-        <ul>
-            {% for ex, sets, duration in workout %}
-            <li>{{ ex }} — {{ sets }} x {{ duration }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
 </div>
 
 </body>

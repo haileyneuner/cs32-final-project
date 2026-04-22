@@ -15,7 +15,7 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
     core = ["Side Plank", "Mountain Climbers", "High Knees",
             "Bear Crawl", "Dead Bugs", "V-ups"]
 
-    # select group
+    # pick group
     if group == "Upper Body":
         exercises = upper
     elif group == "Lower Body":
@@ -23,7 +23,7 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
     else:
         exercises = core
 
-    # workout size based on time
+    # number of exercises
     if time <= 15:
         count = 3
     elif time <= 45:
@@ -32,17 +32,19 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
         count = 5
 
     chosen = random.sample(exercises, min(count, len(exercises)))
+
     plan = []
 
     for ex in chosen:
 
-        # CORE → time based
+        # 🔥 CORE = TIME BASED
         if group == "Core":
             duration = "0:45" if goal == "Lose Weight" else "0:30"
             plan.append(f"{ex}: 3 x {duration}")
 
-        # UPPER → bench-based
+        # 💪 UPPER = BENCH BASED
         elif group == "Upper Body":
+
             if goal == "Gain Muscle":
                 reps = "8–10"
                 pct = 0.75
@@ -56,8 +58,9 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
             else:
                 plan.append(f"{ex}: 3 x {reps}")
 
-        # LOWER → squat-based
+        # 🦵 LOWER = SQUAT BASED
         else:
+
             if goal == "Gain Muscle":
                 reps = "8–10"
                 pct = 0.75
@@ -71,7 +74,7 @@ def get_workout(group, energy, time, goal, bench_max, squat_max):
             else:
                 plan.append(f"{ex}: 3 x {reps}")
 
-    return plan
+    return plan   # ✅ IMPORTANT: only ONE return type
 
 
 @app.route("/", methods=["GET", "POST"])
