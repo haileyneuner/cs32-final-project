@@ -1,10 +1,7 @@
+from flask import Flask, render_template, request
 import random
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
 
+app = Flask(__name__)
 
 def get_workout(group, energy, time):
     workouts = {
@@ -44,77 +41,20 @@ def get_workout(group, energy, time):
     return selected, sets, duration
 
 
-class FitnessUI(BoxLayout):
-    def __init__(self, **kwargs):
-        super().__init__(orientation='vertical', padding=15, spacing=10, **kwargs)
+@app.route("/", methods=["GET", "POST"])
+def index():
+    workout = None
 
-        # Title
-        self.add_widget(Label(text="Workout Generator", font_size=28, size_hint=(1, 0.2)))
-
-        # Muscle group input
-        self.group_input = TextInput(
-            hint_text="Enter: Upper Body, Lower Body, or Core",
-            multiline=False
-        )
-        self.add_widget(self.group_input)
-
-        # Energy input
-        self.energy_input = TextInput(
-            hint_text="Energy level (1-10)",
-            multiline=False,
-            input_filter='int'
-        )
-        self.add_widget(self.energy_input)
-
-        # Time input
-        self.time_input = TextInput(
-            hint_text="Time (minutes)",
-            multiline=False,
-            input_filter='int'
-        )
-        self.add_widget(self.time_input)
-
-        # Generate button
-        btn = Button(text="Generate Workout", size_hint=(1, 0.3))
-        btn.bind(on_press=self.generate_workout)
-        self.add_widget(btn)
-
-        # Output label
-        self.output = Label(text="Your workout will appear here",
-                            halign="left",
-                            valign="top")
-        self.output.bind(size=self.output.setter('text_size'))
-        self.add_widget(self.output)
-
-    def generate_workout(self, instance):
-        group = self.group_input.text.title()
-
-        # Validate inputs
-        try:
-            energy = int(self.energy_input.text)
-            time = int(self.time_input.text)
-        except:
-            self.output.text = "Please enter valid numbers."
-            return
-
-        if group not in ["Upper Body", "Lower Body", "Core"]:
-            self.output.text = "Invalid muscle group."
-            return
+    if request.method == "POST":
+        group = request.form["group"]
+        energy = int(request.form["energy"])
+        time = int(request.form["time"])
 
         exercises, sets, duration = get_workout(group, energy, time)
+        workout = [(ex, sets, duration) for ex in exercises]
 
-        # Format output nicely
-        result = "WORKOUT OF THE DAY\n\n"
-        for ex in exercises:
-            result += f"{ex}: {sets} x {duration}\n"
-
-        self.output.text = result
-
-
-class FitnessApp(App):
-    def build(self):
-        return FitnessUI()
+    return render_template("index.html", workout=workout)
 
 
 if __name__ == "__main__":
-    FitnessApp().run()
+    app.run(debug=True)

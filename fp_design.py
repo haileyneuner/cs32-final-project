@@ -1,71 +1,60 @@
-# sample input:
-# ask user: "What muscle group would you like to workout today? Select: Upper Body, Lower Body, Core"
-# user input: "Core"
-# ask user: "Which muscles would you like to train within [group]?"
-# user input: "All"
-# "how much energy do you have today to spend on a scale of 1-10"
-# user input: "10"
-# "how much time do you have?"
-# user input: "10" # list of input options
+from flask import Flask, render_template, request
+import random
 
-# ouput example (resemble workout app interface):
-# Workout of the Day
-# Side Plank 3x0:30
-# Mountain Climbers 3x0:30
-# High Knees 3x0:30
-# Bear Crawl 3x10 yards
-
-import random  # lets us pick random items
+app = Flask(__name__)
 
 def get_workout(group, energy, time):
-
     workouts = {
-        "Upper Body": ["Push-ups", "Pull-ups", "Shoulder Taps", "Tricep Dips"],
-        "Lower Body": ["Squats", "Lunges", "Glute Bridges", "Calf Raises"],
-        "Core": ["Side Plank", "Mountain Climbers", "High Knees", "Bear Crawl"]
+        "Upper Body": ["Push-ups", "Pull-ups", "Shoulder Press", "Tricep Dips",
+                       "Bicep Curls", "Bench Press", "Incline Bench Press", "Dumbbell Rows"],
+        "Lower Body": ["Bar Squats", "Goblet Squats", "Bulgarian Split Squats",
+                       "RDL", "Lunges", "Glute Bridges", "Calf Raises"],
+        "Core": ["Side Plank", "Mountain Climbers", "High Knees", "Bear Crawl",
+                 "Dead Bugs", "Elbow Planks", "V-ups", "Crunches",
+                 "Toe Taps", "Bicycle Kicks", "Hollow Holds"]
     }
 
-    # Get list for chosen group
     exercises = workouts[group]
 
-    # Decide how many exercises based on time
-    if time < 15:
+    if time <= 10:
         num_exercises = 3
-    elif time >= 30:
-        num_exercises = 5
-    else:
+    elif time <= 20:
         num_exercises = 4
+    else:
+        num_exercises = 5
 
-    # Pick random exercises
-    exercises = random.sample(exercises, min(num_exercises, len(exercises)))
+    selected = random.sample(exercises, min(num_exercises, len(exercises)))
 
-    # Decide difficulty based on energy
     if energy >= 8:
         sets = 3
-        duration = "30 sec"
-    elif energy >= 5:
+        duration = "0:45"
+    elif energy >= 6:
+        sets = 3
+        duration = "0:30"
+    elif energy >= 4:
         sets = 2
-        duration = "20 sec"
+        duration = "0:30"
     else:
-        sets = 1
-        duration = "15 sec"
+        sets = 2
+        duration = "0:15"
 
-    return exercises, sets, duration
-
-
-def main():
-    print("=== Workout Generator ===\n")
-
-    group = input("Muscle group (Upper Body, Lower Body, Core): ")
-    energy = int(input("Energy level (1-10): "))
-    time = int(input("Time available (minutes): "))
-
-    exercises, sets, duration = get_workout(group, energy, time)
-
-    print("\nYour Workout:")
-    for ex in exercises:
-        print(f"{ex}: {sets} x {duration}")
+    return selected, sets, duration
 
 
-main()
+@app.route("/", methods=["GET", "POST"])
+def index():
+    workout = None
 
+    if request.method == "POST":
+        group = request.form["group"]
+        energy = int(request.form["energy"])
+        time = int(request.form["time"])
+
+        exercises, sets, duration = get_workout(group, energy, time)
+        workout = [(ex, sets, duration) for ex in exercises]
+
+    return render_template("index.html", workout=workout)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

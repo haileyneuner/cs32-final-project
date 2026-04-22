@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout Generator</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .card {
+            background: #f4f4f4;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Workout Generator</h1>
+
+<form method="POST">
+    <label>Muscle Group</label>
+    <select name="group">
+        <option>Upper Body</option>
+        <option>Lower Body</option>
+        <option>Core</option>
+    </select>
+
+    <label>Energy Level (1–10)</label>
+    <input type="number" name="energy" min="1" max="10" required>
+
+    <label>Time (minutes)</label>
+    <input type="number" name="time" min="5" max="60" required>
+
+    <button type="submit">Generate Workout</button>
+</form>
+
+{% if workout %}
+<div class="card">
+    <h2>Workout of the Day</h2>
+    <ul>
+        {% for ex, sets, duration in workout %}
+        <li>{{ ex }} — {{ sets }} x {{ duration }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+</body>
+</html>
