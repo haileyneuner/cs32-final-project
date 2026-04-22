@@ -58,6 +58,7 @@ select, input {
  margin-top: 10px;
 }
 
+/* Workout cards */
 .exercise {
  background: #eef2f7;
  padding: 12px;
@@ -65,6 +66,24 @@ select, input {
  margin-bottom: 10px;
 }
 
+.exercise-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+}
+
+/* check / X buttons */
+.icon-btn {
+ border: none;
+ background: none;
+ font-size: 18px;
+ cursor: pointer;
+}
+
+.check { color: green; }
+.x { color: red; }
+
+/* TIMER (MATCH FIRST APP STYLE) */
 .timer-box {
  text-align: center;
  font-size: 32px;
@@ -84,10 +103,16 @@ select, input {
 
 .button-row button {
  flex: 1;
- padding: 10px;
- border: 1px solid #ddd;
+ padding: 8px;
+ border: 2px solid black;
  border-radius: 8px;
  background: white;
+ color: black;
+ font-size: 14px;
+}
+
+.button-row button:active {
+ background: #eee;
 }
 </style>
 </head>
@@ -120,12 +145,12 @@ select, input {
 <label>Squat Max</label>
 <input type="number" name="squat" required>
 
-<label>Energy (1-10)</label>
+<label>Energy</label>
 <input type="range" name="energy" min="1" max="10" value="5"
  oninput="e.innerText=this.value">
 <div>Energy: <span id="e">5</span></div>
 
-<label>Time (minutes)</label>
+<label>Time</label>
 <input type="range" name="time" min="5" max="90" value="30"
  oninput="t.innerText=this.value">
 <div>Time: <span id="t">30</span></div>
@@ -137,20 +162,29 @@ select, input {
 
 <h3>Workout of the Day</h3>
 
-<div>
 {% for item in workout %}
-  <div class="exercise">
-    {{ item.name }}<br>
-    <small>
-      {{ item.sets }} x {{ item.reps }} |
-      {{ item.weight }} |
-      Rest: {{ item.rest }}s
-    </small>
-  </div>
-{% endfor %}
-</div>
+<div class="exercise">
 
-<div class="timer-box" id="timerBox">30:00</div>
+  <div class="exercise-header">
+    <b>{{ item.name }}</b>
+
+    <div>
+      <button class="icon-btn check" onclick="toggle(this)">✔</button>
+      <button class="icon-btn x" onclick="toggle(this)">✖</button>
+    </div>
+  </div>
+
+  <small>
+    {{ item.sets }} x {{ item.reps }} |
+    {{ item.weight }} |
+    Rest {{ item.rest }}s
+  </small>
+
+</div>
+{% endfor %}
+
+<!-- TIMER -->
+<div class="timer-box" id="timerBox">00:30</div>
 
 <div class="button-row">
   <button onclick="startTimer()">Start</button>
@@ -165,20 +199,26 @@ select, input {
 
 <script>
 
-let seconds = 30 * 60;
+/* -------- check / X toggle -------- */
+function toggle(btn) {
+ btn.style.opacity = btn.style.opacity === "0.3" ? "1" : "0.3";
+}
+
+/* -------- TIMER (FIRST APP STYLE) -------- */
+let time = 30 * 60;
 let interval = null;
 
 function updateDisplay() {
- let m = Math.floor(seconds / 60);
- let s = seconds % 60;
+ let sec = time % 60;
+ let display = "00:" + (sec < 10 ? "0" + sec : sec);
 
- document.getElementById("timerBox").innerText =
- String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+ const box = document.getElementById("timerBox");
+ if (!box) return;
 
- let box = document.getElementById("timerBox");
+ box.innerText = display;
 
- if (seconds > 300) box.style.background = "green";
- else if (seconds > 60) box.style.background = "goldenrod";
+ if (time > 300) box.style.background = "green";
+ else if (time > 60) box.style.background = "goldenrod";
  else box.style.background = "red";
 }
 
@@ -186,11 +226,11 @@ function startTimer() {
  if (interval) return;
 
  interval = setInterval(() => {
-   if (seconds > 0) {
-     seconds--;
+   if (time > 0) {
+     time--;
      updateDisplay();
    } else {
-     clearInterval(interval);
+     pauseTimer();
      alert("Workout Complete 🔥");
    }
  }, 1000);
@@ -202,9 +242,9 @@ function pauseTimer() {
 }
 
 function resetTimer() {
- pauseTimer();
- seconds = 30 * 60;
+ time = 30 * 60;
  updateDisplay();
+ pauseTimer();
 }
 
 updateDisplay();
@@ -255,7 +295,6 @@ def get_workout(group, energy, time, bench, squat, goal):
         elif ex in ["Goblet Squats", "RDL", "Lunges"]:
             weight = f"{calc_weight(squat * 0.5, energy, goal)} lbs (DB)"
 
-        # smart volume scaling
         if energy >= 8:
             sets, reps, rest = 4, 10, 60
         elif energy >= 5:
@@ -273,8 +312,6 @@ def get_workout(group, energy, time, bench, squat, goal):
 
     return output
 
-
-# ---------------- FLASK ----------------
 
 @app.route("/", methods=["GET", "POST"])
 def home():
