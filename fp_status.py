@@ -30,14 +30,9 @@ body {
  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-h1, h2, h3 {
- text-align: center;
-}
+h1, h2, h3 { text-align: center; }
 
-label {
- font-size: 12px;
- color: #555;
-}
+label { font-size: 12px; color: #555; }
 
 select, input {
  width: 100%;
@@ -58,21 +53,16 @@ select, input {
  margin-top: 10px;
 }
 
-/* Workout cards */
 .exercise {
  background: #eef2f7;
  padding: 12px;
  border-radius: 10px;
  margin-bottom: 10px;
-}
-
-.exercise-header {
  display: flex;
  justify-content: space-between;
  align-items: center;
 }
 
-/* check / X buttons */
 .icon-btn {
  border: none;
  background: none;
@@ -80,10 +70,7 @@ select, input {
  cursor: pointer;
 }
 
-.check { color: green; }
-.x { color: red; }
-
-/* TIMER (MATCH FIRST APP STYLE) */
+/* TIMER (EXACT FIRST CODE STYLE) */
 .timer-box {
  text-align: center;
  font-size: 32px;
@@ -165,25 +152,18 @@ select, input {
 {% for item in workout %}
 <div class="exercise">
 
-  <div class="exercise-header">
-    <b>{{ item.name }}</b>
-
-    <div>
-      <button class="icon-btn check" onclick="toggle(this)">✔</button>
-      <button class="icon-btn x" onclick="toggle(this)">✖</button>
-    </div>
+  <div>
+    <b>{{ item.name }}</b><br>
+    <small>{{ item.sets }} x {{ item.reps }} | {{ item.weight }} | Rest {{ item.rest }}s</small>
   </div>
 
-  <small>
-    {{ item.sets }} x {{ item.reps }} |
-    {{ item.weight }} |
-    Rest {{ item.rest }}s
-  </small>
+  <!-- EXACT CHECK/X TOGGLE STYLE -->
+  <button class="icon-btn" onclick="toggle(this)">✔</button>
 
 </div>
 {% endfor %}
 
-<!-- TIMER -->
+<!-- TIMER (EXACT FIRST CODE) -->
 <div class="timer-box" id="timerBox">00:30</div>
 
 <div class="button-row">
@@ -199,13 +179,19 @@ select, input {
 
 <script>
 
-/* -------- check / X toggle -------- */
+/* ---------------- CHECK/X TOGGLE (FIRST STYLE) ---------------- */
 function toggle(btn) {
- btn.style.opacity = btn.style.opacity === "0.3" ? "1" : "0.3";
+ if (btn.innerText === "✔") {
+   btn.innerText = "✖";
+   btn.style.color = "red";
+ } else {
+   btn.innerText = "✔";
+   btn.style.color = "green";
+ }
 }
 
-/* -------- TIMER (FIRST APP STYLE) -------- */
-let time = 30 * 60;
+/* ---------------- TIMER (EXACT FIRST CODE) ---------------- */
+let time = 30;
 let interval = null;
 
 function updateDisplay() {
@@ -213,13 +199,18 @@ function updateDisplay() {
  let display = "00:" + (sec < 10 ? "0" + sec : sec);
 
  const box = document.getElementById("timerBox");
- if (!box) return;
 
- box.innerText = display;
+ if (box) {
+   box.innerText = display;
 
- if (time > 300) box.style.background = "green";
- else if (time > 60) box.style.background = "goldenrod";
- else box.style.background = "red";
+   if (time > 5) {
+     box.style.background = "green";
+   } else if (time > 0) {
+     box.style.background = "goldenrod";
+   } else {
+     box.style.background = "red";
+   }
+ }
 }
 
 function startTimer() {
@@ -229,9 +220,6 @@ function startTimer() {
    if (time > 0) {
      time--;
      updateDisplay();
-   } else {
-     pauseTimer();
-     alert("Workout Complete 🔥");
    }
  }, 1000);
 }
@@ -242,7 +230,7 @@ function pauseTimer() {
 }
 
 function resetTimer() {
- time = 30 * 60;
+ time = 30;
  updateDisplay();
  pauseTimer();
 }
