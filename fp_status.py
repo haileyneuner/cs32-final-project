@@ -151,7 +151,7 @@ select, input {
 <label>Time</label>
 <input type="range" name="time" min="5" max="90" value="30"
  oninput="t.innerText=this.value">
-<div>Time: <span id="t">30</span></div>
+<div>Time (min): <span id="t">30</span></div>
 
 <button class="main-btn" type="submit">Generate</button>
 </form>
