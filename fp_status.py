@@ -45,7 +45,6 @@ select, input {
  padding: 10px;
  border-radius: 8px;
  border: 1px solid #ddd;
- background: white;
 }
 
 .main-btn {
@@ -64,14 +63,6 @@ select, input {
  padding: 12px;
  border-radius: 10px;
  margin-bottom: 10px;
-}
-
-.set-row {
- display: flex;
- align-items: center;
- gap: 10px;
- font-size: 13px;
- margin-left: 5px;
 }
 
 .timer-box {
@@ -129,9 +120,10 @@ select, input {
 <label>Squat Max</label>
 <input type="number" name="squat" required>
 
-<label>Energy: <span id="e">5</span></label>
+<label>Energy (1-10)</label>
 <input type="range" name="energy" min="1" max="10" value="5"
  oninput="e.innerText=this.value">
+<div>Energy: <span id="e">5</span></div>
 
 <label>Time (minutes)</label>
 <input type="range" name="time" min="5" max="90" value="30"
@@ -143,35 +135,27 @@ select, input {
 
 {% if workout %}
 
-<div class="card">
-<h3>Workout</h3>
+<h3>Workout of the Day</h3>
 
+<div>
 {% for item in workout %}
-<div class="exercise">
-
-  <b>{{ item.name }}</b> — {{ item.weight }}
-
-  <div style="margin-top:8px;">
-    {% for s in range(item.sets) %}
-    <div class="set-row">
-      <input type="checkbox">
-      Set {{ s+1 }} — {{ item.reps }} reps
-    </div>
-    {% endfor %}
+  <div class="exercise">
+    {{ item.name }}<br>
+    <small>
+      {{ item.sets }} x {{ item.reps }} |
+      {{ item.weight }} |
+      Rest: {{ item.rest }}s
+    </small>
   </div>
-
-  <small>Rest: {{ item.rest }} sec</small>
-</div>
 {% endfor %}
-
 </div>
 
 <div class="timer-box" id="timerBox">30:00</div>
 
 <div class="button-row">
-<button onclick="startTimer()">Start</button>
-<button onclick="pauseTimer()">Pause</button>
-<button onclick="resetTimer()">Reset</button>
+  <button onclick="startTimer()">Start</button>
+  <button onclick="pauseTimer()">Pause</button>
+  <button onclick="resetTimer()">Reset</button>
 </div>
 
 {% endif %}
@@ -271,6 +255,7 @@ def get_workout(group, energy, time, bench, squat, goal):
         elif ex in ["Goblet Squats", "RDL", "Lunges"]:
             weight = f"{calc_weight(squat * 0.5, energy, goal)} lbs (DB)"
 
+        # smart volume scaling
         if energy >= 8:
             sets, reps, rest = 4, 10, 60
         elif energy >= 5:
