@@ -8,7 +8,6 @@ HTML = """
 <html>
 <head>
     <title>Workout Generator</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
@@ -31,10 +30,7 @@ HTML = """
 
         h1 { text-align: center; }
 
-        label {
-            font-size: 12px;
-            color: #aaa;
-        }
+        label { font-size: 12px; color: #aaa; }
 
         select, input {
             width: 100%;
@@ -76,7 +72,22 @@ HTML = """
             border-radius: 10px;
         }
 
-        li { margin-bottom: 6px; }
+        .exercise {
+            border-bottom: 1px solid #222;
+            padding: 10px 0;
+        }
+
+        .sets {
+            margin-top: 8px;
+        }
+
+        .set-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #ccc;
+        }
 
         .timer {
             margin-top: 20px;
@@ -115,7 +126,7 @@ HTML = """
         </select>
 
         <label>Muscle Group</label>
-        <select name="group" id="groupSelect" onchange="checkGroup()">
+        <select name="group">
             <option>Upper Body</option>
             <option>Lower Body</option>
             <option>Core</option>
@@ -141,22 +152,33 @@ HTML = """
     </form>
 
     {% if workout %}
+
     <div class="card">
         <h3>Workout</h3>
-        <ul>
-            {% for item in workout %}
-            <li>
-                {{ item.name }}
-                <span style="color:#00ff88;"> — {{ item.weight }}</span>
-            </li>
-            {% endfor %}
-        </ul>
+
+        {% for item in workout %}
+        <div class="exercise">
+            <div><b>{{ item.name }}</b> — {{ item.weight }}</div>
+
+            <div class="sets">
+                {% for s in range(item.sets) %}
+                <div class="set-row">
+                    <input type="checkbox">
+                    Set {{ s + 1 }} — {{ item.reps }} reps
+                </div>
+                {% endfor %}
+            </div>
+
+            <small style="color:#00ff88;">Rest: {{ item.rest }} sec</small>
+        </div>
+        {% endfor %}
     </div>
+
     {% endif %}
 
     <!-- TIMER -->
-    <div class="timer" id="timerBox">
-        <h3>Core Timer</h3>
+    <div class="timer">
+        <h3>Countdown Timer</h3>
         <div class="time" id="timeDisplay">00:00</div>
 
         <div class="timer-controls">
@@ -170,12 +192,13 @@ HTML = """
 
 <script>
 let timer = null;
-let seconds = 0;
+let seconds = 30 * 60; // default 30 min countdown
 let running = false;
 
 function updateDisplay() {
     let m = Math.floor(seconds / 60);
     let s = seconds % 60;
+
     document.getElementById("timeDisplay").innerText =
         String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 }
@@ -183,9 +206,15 @@ function updateDisplay() {
 function startTimer() {
     if (running) return;
     running = true;
+
     timer = setInterval(() => {
-        seconds++;
-        updateDisplay();
+        if (seconds > 0) {
+            seconds--;
+            updateDisplay();
+        } else {
+            pauseTimer();
+            alert("Workout Complete 🔥");
+        }
     }, 1000);
 }
 
@@ -196,24 +225,18 @@ function pauseTimer() {
 
 function resetTimer() {
     pauseTimer();
-    seconds = 0;
+    seconds = 30 * 60;
     updateDisplay();
 }
 
-function checkGroup() {
-    const group = document.getElementById("groupSelect").value;
-    const box = document.getElementById("timerBox");
-    box.style.display = (group === "Core") ? "block" : "block";
-}
-
-document.addEventListener("DOMContentLoaded", checkGroup);
+updateDisplay();
 </script>
 
 </body>
 </html>
 """
 
-# ---------- SMART WEIGHT LOGIC ----------
+# ---------------- LOGIC ----------------
 
 def calc_weight(max_lift, energy, goal):
     if goal == "Gain Muscle":
@@ -221,48 +244,58 @@ def calc_weight(max_lift, energy, goal):
     else:
         pct = 0.65 if energy >= 8 else 0.55 if energy >= 5 else 0.45
 
-    weight = round(max_lift * pct / 5) * 5
-    return weight
+    return round(max_lift * pct / 5) * 5
 
 
 def get_workout(group, energy, time, bench, squat, goal):
 
-    workouts = {
-        "Upper Body": ["Push-ups", "Pull-ups", "Shoulder Press", "Tricep Dips",
-                       "Bicep Curls", "Bench Press", "Incline Bench Press", "Dumbbell Rows"],
-        "Lower Body": ["Bar Squats", "Goblet Squats", "Bulgarian Split Squats",
-                       "RDL", "Lunges", "Glute Bridges", "Calf Raises"],
-        "Core": ["Planks", "Crunches", "Mountain Climbers", "Dead Bugs", "Bear Crawl"]
+    base = {
+        "Upper Body": ["Bench Press", "Incline Bench Press", "Shoulder Press",
+                       "Tricep Dips", "Bicep Curls", "Dumbbell Rows"],
+        "Lower Body": ["Bar Squats", "Goblet Squats", "RDL", "Lunges"],
+        "Core": ["Planks", "Crunches", "Mountain Climbers", "Dead Bugs"]
     }
 
-    selected = random.sample(workouts[group], 4)
+    exercises = random.sample(base[group], 4)
 
     output = []
 
-    for ex in selected:
+    for ex in exercises:
 
         weight = "Bodyweight"
 
-        # Bench-based lifts
         if ex in ["Bench Press", "Incline Bench Press"]:
             weight = f"{calc_weight(bench, energy, goal)} lbs"
+
+        elif ex in ["Bar Squats"]:
+            weight = f"{calc_weight(squat, energy, goal)} lbs"
 
         elif ex in ["Shoulder Press", "Tricep Dips", "Bicep Curls", "Dumbbell Rows"]:
             weight = f"{calc_weight(bench * 0.6, energy, goal)} lbs (DB)"
 
-        # Squat-based lifts
-        elif ex == "Bar Squats":
-            weight = f"{calc_weight(squat, energy, goal)} lbs"
-
         elif ex in ["Goblet Squats", "RDL", "Lunges"]:
             weight = f"{calc_weight(squat * 0.5, energy, goal)} lbs (DB)"
 
-        output.append({"name": ex, "weight": weight})
+        # sets + reps scaling
+        if energy >= 8:
+            sets, reps, rest = 4, 10, 60
+        elif energy >= 5:
+            sets, reps, rest = 3, 12, 45
+        else:
+            sets, reps, rest = 2, 15, 30
+
+        output.append({
+            "name": ex,
+            "weight": weight,
+            "sets": sets,
+            "reps": reps,
+            "rest": rest
+        })
 
     return output
 
 
-# ---------- FLASK ----------
+# ---------------- FLASK ----------------
 
 @app.route("/", methods=["GET", "POST"])
 def home():
