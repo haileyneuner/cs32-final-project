@@ -30,9 +30,14 @@ body {
  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-h1, h2, h3 { text-align: center; }
+h2, h3 {
+ text-align: center;
+}
 
-label { font-size: 12px; color: #555; }
+label {
+ font-size: 12px;
+ color: #555;
+}
 
 select, input {
  width: 100%;
@@ -70,13 +75,19 @@ select, input {
  cursor: pointer;
 }
 
-/* TIMER (EXACT FIRST CODE STYLE) */
+/* TIMER (EXACT FIRST STYLE) */
+.timer-title {
+ text-align: center;
+ margin-top: 20px;
+ font-weight: bold;
+}
+
 .timer-box {
  text-align: center;
  font-size: 32px;
  padding: 20px;
  border-radius: 12px;
- margin: 20px 0;
+ margin: 10px 0 20px 0;
  color: white;
  background: green;
  transition: background 0.3s;
@@ -157,13 +168,15 @@ select, input {
     <small>{{ item.sets }} x {{ item.reps }} | {{ item.weight }} | Rest {{ item.rest }}s</small>
   </div>
 
-  <!-- EXACT CHECK/X TOGGLE STYLE -->
+  <!-- ✔ / ✖ TOGGLE (EXACT FIRST STYLE) -->
   <button class="icon-btn" onclick="toggle(this)">✔</button>
 
 </div>
 {% endfor %}
 
-<!-- TIMER (EXACT FIRST CODE) -->
+<!-- REST TIMER -->
+<div class="timer-title">REST TIMER</div>
+
 <div class="timer-box" id="timerBox">00:30</div>
 
 <div class="button-row">
@@ -179,7 +192,7 @@ select, input {
 
 <script>
 
-/* ---------------- CHECK/X TOGGLE (FIRST STYLE) ---------------- */
+/* ---------------- TOGGLE (EXACT FIRST STYLE) ---------------- */
 function toggle(btn) {
  if (btn.innerText === "✔") {
    btn.innerText = "✖";
@@ -190,9 +203,9 @@ function toggle(btn) {
  }
 }
 
-/* ---------------- TIMER (EXACT FIRST CODE) ---------------- */
-let time = 30;
+/* ---------------- REST TIMER ---------------- */
 let interval = null;
+let time = {{ workout[0].rest if workout else 30 }};
 
 function updateDisplay() {
  let sec = time % 60;
@@ -230,7 +243,7 @@ function pauseTimer() {
 }
 
 function resetTimer() {
- time = 30;
+ time = {{ workout[0].rest if workout else 30 }};
  updateDisplay();
  pauseTimer();
 }
