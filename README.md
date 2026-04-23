@@ -1,5 +1,7 @@
 # cs32-final-project
 My CS32 Final Project with Hailey and Leticia
 
-WORKOUT PLANNER: subtask 1 - Ask user what kind of workout they want? (Target muscle group, intensity of reps/weight, energy level for the day) From here will pull exercises from a list and assign sets, reps and weight percentages to each.
+WORKOUT PLANNER: Generate a workout plan based on the user's goal (gain muscle or lose weight), muscle group of choice (upper, lower, core), maximum squat and bench weight, energy level (based on slider) and time (up to 90 minutes). Provides a list of exercises with sets and reps or time and weight calculated as percentage of maxes. As well as a check feature for the user to complete. A rest timer is also provided with start stop and reset features.
 
+Contributors: Hailey Neuner, Leticia Pires
+ChatGPT was also used for turning the code written into a userinterface using flask to open up as a web browser. All code (1-258) regarding the interface and the main function (318-322, 332, 335-336) was written by Chatgpt, but the substantive code was written by the two contributors.
