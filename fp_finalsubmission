@@ -319,7 +319,7 @@ def get_workout(group, energy, time, bench, squat, goal):
         if group == "Core":
             if energy <= 5:
                 sets, reps, rest = 2, 30, 30
-            elif time <= 7:
+            elif energy <= 7:
                 sets, reps, rest = 3, 45, 30
             else:
                 sets, reps, rest = 4, 60, 30
