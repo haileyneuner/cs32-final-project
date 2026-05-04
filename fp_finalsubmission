@@ -302,7 +302,17 @@ def calc_weight(max_lift, percent, goal):
     weight = max_lift * percent * multiplier
     return round(weight / 5) * 5
 def get_workout(group, energy, time, bench, squat, goal):
-    exercises = random.sample(list(exercises_data[group].keys()), 4)
+    pool = list(exercises_data[group].keys())
+    if time <= 20:
+        n = 3
+    elif time <= 45:
+        n = 4
+    elif time <= 70:
+        n = 5
+    else:
+        n = 6
+    n = min(n, len(pool))
+    exercises = random.sample(pool, n)
     output = []
 
     for ex in exercises:
