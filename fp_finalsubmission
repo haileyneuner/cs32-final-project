@@ -302,45 +302,57 @@ def calc_weight(max_lift, percent, goal):
     weight = max_lift * percent * multiplier
     return round(weight / 5) * 5
 def get_workout(group, energy, time, bench, squat, goal):
-    if time <= 20:
-        num_exercises = 3
-    elif time <= 45:
-        num_exercises = 4
-    elif time <= 70:
-        num_exercises = 5
-    else:
-        num_exercises = 6
-    pool = list(exercises_data[group].keys())
-    num_exercises = min(num_exercises, len(pool))
-    exercises = random.sample(pool, num_exercises)
+    exercises = random.sample(list(exercises_data[group].keys()), 4)
     output = []
+
     for ex in exercises:
         percent = exercises_data[group][ex]
         weight = "Bodyweight"
         base = bench if group == "Upper Body" else squat
+
         if percent is not None and base > 0:
             calc = calc_weight(base, percent, goal)
             weight = f"{calc} lbs"
         else:
             weight = None
-        if energy >= 8:
-            sets, reps, rest = 4, 10, 60
-        elif energy >= 5:
-            sets, reps, rest = 3, 12, 45
+
+        if group == "Core":
+            if energy <= 5:
+                sets, reps, rest = 2, 30, 30
+            elif time <= 7:
+                sets, reps, rest = 3, 45, 30
+            else:
+                sets, reps, rest = 4, 60, 30
+
         else:
-            sets, reps, rest = 2, 15, 30
-        if goal == "Gain Muscle":
-            reps = reps // 2
+            if energy >= 8:
+                sets, reps, rest = 4, 10, 60
+            elif energy >= 5:
+                sets, reps, rest = 3, 12, 45
+            else:
+                sets, reps, rest = 2, 15, 30
+        if group != "Core":
+            if goal == "Gain Muscle":
+                reps = reps // 2
+            else: reps = reps
         else:
             reps = reps
+
+        if group == "Core":
+            rep_display = f"{reps}s"
+        else:
+            rep_display = reps
+
         output.append({
             "name": ex,
             "weight": weight,
             "sets": sets,
-            "reps": reps,
+            "reps": rep_display,
             "rest": rest
         })
+
     return output
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     workout = None
